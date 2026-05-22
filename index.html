@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuenta Regresiva — La Niebla se Acerca</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --jade: #3a7d5c;
+    --jade-light: #5aad84;
+    --jade-dark: #1e4a35;
+    --jade-glow: #7fffc4;
+    --gold: #c9a44a;
+    --gold-light: #f0d080;
+    --gold-dim: #7a5e20;
+    --red-mist: #8b1a1a;
+    --cream: #f5e6c8;
+    --parchment: #d4b483;
+    --dark-bg: #0a0e0c;
+    --panel-bg: rgba(10, 20, 14, 0.88);
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+  }
+
+  body {
+    background-color: var(--dark-bg);
+    font-family: 'Cinzel', serif;
+    color: var(--cream);
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* === BACKGROUND === */
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .bg-base {
+    background:
+      radial-gradient(ellipse at 50% 80%, rgba(42,90,60,0.35) 0%, transparent 65%),
+      radial-gradient(ellipse at 20% 20%, rgba(139,26,26,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 10%, rgba(42,90,60,0.1) 0%, transparent 50%),
+      #060e08;
+  }
+
+  /* Bamboo silhouettes */
+  .bamboo {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.07;
+    background-image:
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0px, transparent 34px,
+        rgba(100,180,120,0.8) 34px, rgba(100,180,120,0.8) 38px
+      );
+    background-size: 3px 38px;
+    background-repeat: repeat-x;
+    mask-image: repeating-linear-gradient(
+      to right,
+      transparent 0%, transparent 3%, rgba(0,0,0,0.9) 3.5%, rgba(0,0,0,0.9) 4.5%, transparent 5%
+    );
+  }
+
+  /* Mist layers */
+  .mist {
+    position: absolute;
+    width: 200%;
+    height: 100px;
+    border-radius: 50%;
+    opacity: 0;
+    animation: mistDrift linear infinite;
+  }
+  .mist-1 {
+    background: radial-gradient(ellipse, rgba(90,173,132,0.12) 0%, transparent 70%);
+    bottom: 15%;
+    left: -50%;
+    height: 180px;
+    animation-duration: 18s;
+    animation-delay: 0s;
+  }
+  .mist-2 {
+    background: radial-gradient(ellipse, rgba(58,125,92,0.08) 0%, transparent 70%);
+    bottom: 30%;
+    left: -60%;
+    height: 140px;
+    animation-duration: 25s;
+    animation-delay: -8s;
+  }
+  .mist-3 {
+    background: radial-gradient(ellipse, rgba(42,90,60,0.1) 0%, transparent 70%);
+    top: 20%;
+    left: -40%;
+    height: 160px;
+    animation-duration: 20s;
+    animation-delay: -12s;
+  }
+
+  @keyframes mistDrift {
+    0%   { transform: translateX(0); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { transform: translateX(50%); opacity: 0; }
+  }
+
+  /* Fireflies */
+  .firefly {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--jade-glow);
+    box-shadow: 0 0 6px 2px rgba(127,255,196,0.6);
+    animation: fireflyFloat linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes fireflyFloat {
+    0%   { opacity: 0; transform: translate(0, 0); }
+    20%  { opacity: 0.8; }
+    50%  { opacity: 0.3; }
+    80%  { opacity: 0.9; }
+    100% { opacity: 0; transform: translate(var(--dx, 60px), var(--dy, -80px)); }
+  }
+
+  /* === LAYOUT === */
+  .page {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 860px;
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+    text-align: center;
+  }
+
+  /* === DECORATIVE LINES === */
+  .orn-line {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 600px;
+  }
+  .orn-line::before, .orn-line::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+  .orn-diamond {
+    width: 8px;
+    height: 8px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+    box-shadow: 0 0 8px var(--gold-light);
+  }
+
+  /* === HEADER === */
+  .header-eyebrow {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--jade-light);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+
+  .main-title {
+    font-family: 'Cinzel Decorative', cursive;
+    font-weight: 900;
+    font-size: clamp(2rem, 6vw, 3.8rem);
+    line-height: 1.1;
+    color: var(--gold-light);
+    text-shadow:
+      0 0 30px rgba(201,164,74,0.5),
+      0 0 80px rgba(201,164,74,0.2),
+      2px 2px 0 var(--gold-dim);
+    animation: titlePulse 4s ease-in-out infinite;
+  }
+
+  @keyframes titlePulse {
+    0%, 100% { text-shadow: 0 0 30px rgba(201,164,74,0.5), 0 0 80px rgba(201,164,74,0.2), 2px 2px 0 var(--gold-dim); }
+    50%       { text-shadow: 0 0 50px rgba(201,164,74,0.8), 0 0 120px rgba(201,164,74,0.4), 2px 2px 0 var(--gold-dim); }
+  }
+
+  .subtitle {
+    font-family: 'IM Fell English', serif;
+    font-size: 1.05rem;
+    color: var(--parchment);
+    opacity: 0.85;
+    letter-spacing: 0.1em;
+  }
+
+  /* === JADE DRAGON DIVIDER === */
+  .jade-seal {
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(201,164,74,0.3), inset 0 0 15px rgba(201,164,74,0.1);
+    animation: sealRotate 12s linear infinite;
+    flex-shrink: 0;
+  }
+  .jade-seal svg {
+    width: 36px;
+    height: 36px;
+    fill: var(--gold);
+    filter: drop-shadow(0 0 6px rgba(201,164,74,0.6));
+  }
+  @keyframes sealRotate {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* === COUNTDOWN PANEL === */
+  .countdown-frame {
+    width: 100%;
+    max-width: 720px;
+    border: 1px solid var(--gold-dim);
+    background: var(--panel-bg);
+    position: relative;
+    padding: 2.5rem 2rem 2rem;
+    backdrop-filter: blur(8px);
+    box-shadow:
+      0 0 60px rgba(42,90,60,0.3),
+      inset 0 0 40px rgba(10,20,14,0.8);
+  }
+
+  /* Corner decorations */
+  .countdown-frame::before,
+  .countdown-frame::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: var(--gold);
+    border-style: solid;
+  }
+  .countdown-frame::before {
+    top: -1px; left: -1px;
+    border-width: 2px 0 0 2px;
+  }
+  .countdown-frame::after {
+    bottom: -1px; right: -1px;
+    border-width: 0 2px 2px 0;
+  }
+  .corner-tr, .corner-bl {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: var(--gold);
+    border-style: solid;
+  }
+  .corner-tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+  .corner-bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+
+  .countdown-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+    width: 100%;
+  }
+
+  .unit-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+  }
+
+  .unit-block + .unit-block::before {
+    content: ':';
+    position: absolute;
+    left: -0.65rem;
+    top: 50%;
+    transform: translateY(-70%);
+    font-size: 2.5rem;
+    color: var(--gold-dim);
+    font-weight: 700;
+    animation: colonBlink 1s step-end infinite;
+    line-height: 1;
+  }
+
+  @keyframes colonBlink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.2; }
+  }
+
+  .unit-number {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: clamp(2.4rem, 7vw, 4.5rem);
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 1;
+    position: relative;
+    text-shadow:
+      0 0 20px rgba(90,173,132,0.4),
+      0 2px 4px rgba(0,0,0,0.8);
+    min-width: 2ch;
+    transition: transform 0.15s ease, color 0.3s;
+  }
+
+  .unit-number.tick {
+    animation: numberTick 0.3s ease;
+  }
+
+  @keyframes numberTick {
+    0%   { transform: translateY(-8px); opacity: 0.4; color: var(--jade-glow); }
+    100% { transform: translateY(0);    opacity: 1;   color: var(--cream); }
+  }
+
+  .unit-bar {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--jade), var(--gold), var(--jade), transparent);
+    border-radius: 1px;
+    box-shadow: 0 0 6px var(--jade-light);
+  }
+
+  .unit-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--jade-light);
+    font-family: 'Cinzel', serif;
+  }
+
+  /* === DATE DISPLAY === */
+  .target-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--parchment);
+    opacity: 0.7;
+  }
+
+  /* === FOOTER QUOTE === */
+  .quote {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--jade-light);
+    opacity: 0.6;
+    max-width: 500px;
+    line-height: 1.6;
+  }
+
+  /* === LOTUSES === */
+  .lotus-row {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    opacity: 0.5;
+  }
+  .lotus-svg {
+    width: 28px;
+    height: 28px;
+    fill: var(--jade-light);
+    animation: lotusFloat 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 4px rgba(90,173,132,0.4));
+  }
+  .lotus-svg:nth-child(2) { animation-delay: -1s; transform-origin: center; }
+  .lotus-svg:nth-child(3) { animation-delay: -2s; }
+
+  @keyframes lotusFloat {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-5px); }
+  }
+
+  /* === FINISH === */
+  .finished-text {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 2rem;
+    color: var(--gold-light);
+    text-shadow: 0 0 40px rgba(201,164,74,0.8);
+    animation: titlePulse 2s ease-in-out infinite;
+  }
+
+  @media (max-width: 540px) {
+    .countdown-grid { gap: 0.5rem; }
+    .unit-block + .unit-block::before { font-size: 1.5rem; left: -0.4rem; }
+    .page { padding: 2rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-layer bg-base">
+  <div class="bamboo"></div>
+  <div class="mist mist-1"></div>
+  <div class="mist mist-2"></div>
+  <div class="mist mist-3"></div>
+  <!-- Fireflies injected by JS -->
+</div>
+
+<main class="page">
+
+  <!-- Top ornament -->
+  <div class="orn-line">
+    <div class="orn-diamond"></div>
+  </div>
+
+  <p class="header-eyebrow">La Niebla Desciende · 迷雾降临</p>
+
+  <h1 class="main-title">Mists of<br>Pandaria</h1>
+
+  <p class="subtitle">El tiempo se acerca... La niebla aguarda tu llegada</p>
+
+  <!-- Lotus row -->
+  <div class="lotus-row" aria-hidden="true">
+    <svg class="lotus-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2c0 0-2 4-2 7 0 1.1.9 2 2 2s2-.9 2-2c0-3-2-7-2-7z"/>
+      <path d="M5 8c0 0 3 2 4 5-.6.8-1.6 1-2.5.6C5.2 12.8 4 10.5 5 8z"/>
+      <path d="M19 8c0 0-3 2-4 5 .6.8 1.6 1 2.5.6C18.8 12.8 20 10.5 19 8z"/>
+      <path d="M12 14c-4 0-6 3-6 3s2 3 6 3 6-3 6-3-2-3-6-3z"/>
+    </svg>
+    <svg class="lotus-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2c0 0-2 4-2 7 0 1.1.9 2 2 2s2-.9 2-2c0-3-2-7-2-7z"/>
+      <path d="M5 8c0 0 3 2 4 5-.6.8-1.6 1-2.5.6C5.2 12.8 4 10.5 5 8z"/>
+      <path d="M19 8c0 0-3 2-4 5 .6.8 1.6 1 2.5.6C18.8 12.8 20 10.5 19 8z"/>
+      <path d="M12 14c-4 0-6 3-6 3s2 3 6 3 6-3 6-3-2-3-6-3z"/>
+    </svg>
+    <svg class="lotus-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2c0 0-2 4-2 7 0 1.1.9 2 2 2s2-.9 2-2c0-3-2-7-2-7z"/>
+      <path d="M5 8c0 0 3 2 4 5-.6.8-1.6 1-2.5.6C5.2 12.8 4 10.5 5 8z"/>
+      <path d="M19 8c0 0-3 2-4 5 .6.8 1.6 1 2.5.6C18.8 12.8 20 10.5 19 8z"/>
+      <path d="M12 14c-4 0-6 3-6 3s2 3 6 3 6-3 6-3-2-3-6-3z"/>
+    </svg>
+  </div>
+
+  <!-- Countdown panel -->
+  <div class="countdown-frame" role="timer" aria-live="polite" aria-label="Cuenta regresiva">
+    <div class="corner-tr"></div>
+    <div class="corner-bl"></div>
+
+    <div class="countdown-grid" id="countdown-grid">
+      <div class="unit-block">
+        <div class="unit-number" id="days">000</div>
+        <div class="unit-bar"></div>
+        <div class="unit-label">Días</div>
+      </div>
+      <div class="unit-block">
+        <div class="unit-number" id="hours">00</div>
+        <div class="unit-bar"></div>
+        <div class="unit-label">Horas</div>
+      </div>
+      <div class="unit-block">
+        <div class="unit-number" id="minutes">00</div>
+        <div class="unit-bar"></div>
+        <div class="unit-label">Minutos</div>
+      </div>
+      <div class="unit-block">
+        <div class="unit-number" id="seconds">00</div>
+        <div class="unit-bar"></div>
+        <div class="unit-label">Segundos</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="target-date">Objetivo: 08 de Agosto, 2026</p>
+
+  <!-- Bottom ornament -->
+  <div class="orn-line">
+    <div class="jade-seal" aria-hidden="true">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L9.5 7.5L4 8.27L8 12.14L7.09 17.64L12 15L16.91 17.64L16 12.14L20 8.27L14.5 7.5L12 2Z"/>
+      </svg>
+    </div>
+  </div>
+
+  <p class="quote">"La niebla no es un obstáculo para el que sabe escuchar el viento.<br>— Chen Stormstout"</p>
+
+  <div class="orn-line">
+    <div class="orn-diamond"></div>
+  </div>
+
+</main>
+
+<script>
+  // Target date: August 8, 2026 at midnight local time
+  const TARGET = new Date('2026-08-08T00:00:00');
+
+  const els = {
+    days:    document.getElementById('days'),
+    hours:   document.getElementById('hours'),
+    minutes: document.getElementById('minutes'),
+    seconds: document.getElementById('seconds'),
+  };
+
+  function pad(n, len = 2) {
+    return String(n).padStart(len, '0');
+  }
+
+  let prev = { days: null, hours: null, minutes: null, seconds: null };
+
+  function tick() {
+    const now  = new Date();
+    const diff = TARGET - now;
+
+    if (diff <= 0) {
+      document.getElementById('countdown-grid').innerHTML =
+        '<p class="finished-text" style="grid-column:1/-1">¡La Niebla ha llegado!</p>';
+      return;
+    }
+
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000)  / 60000);
+    const s = Math.floor((diff % 60000)    / 1000);
+
+    const vals = { days: d, hours: h, minutes: m, seconds: s };
+    const pads = { days: 3, hours: 2, minutes: 2, seconds: 2 };
+
+    for (const [key, val] of Object.entries(vals)) {
+      if (val !== prev[key]) {
+        els[key].textContent = pad(val, pads[key]);
+        els[key].classList.remove('tick');
+        void els[key].offsetWidth; // reflow
+        els[key].classList.add('tick');
+        prev[key] = val;
+      }
+    }
+  }
+
+  tick();
+  setInterval(tick, 1000);
+
+  // Fireflies
+  const bg = document.querySelector('.bg-layer');
+  function spawnFirefly() {
+    const ff = document.createElement('div');
+    ff.className = 'firefly';
+    const x = Math.random() * 100;
+    const y = 20 + Math.random() * 70;
+    const dx = (Math.random() - 0.5) * 120;
+    const dy = -(30 + Math.random() * 100);
+    const dur = 6 + Math.random() * 8;
+    ff.style.cssText = `
+      left: ${x}%;
+      top:  ${y}%;
+      --dx: ${dx}px;
+      --dy: ${dy}px;
+      animation-duration: ${dur}s;
+      animation-delay: 0s;
+    `;
+    bg.appendChild(ff);
+    setTimeout(() => ff.remove(), dur * 1000 + 500);
+  }
+
+  setInterval(spawnFirefly, 600);
+  for (let i = 0; i < 8; i++) {
+    setTimeout(spawnFirefly, i * 400);
+  }
+</script>
+</body>
+</html>
