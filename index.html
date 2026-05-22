@@ -656,6 +656,34 @@
         Chen Stormstout"
       </p>
 
+      <!-- Comments Section -->
+      <section class="comments-section" aria-label="Comentarios">
+        <p class="comments-title">✦ Susurros de la Niebla ✦</p>
+
+        <div class="comment-input-wrap">
+          <textarea
+            class="comment-textarea"
+            id="comment-input"
+            placeholder="Deja tu mensaje antes de que llegue la niebla..."
+            rows="2"
+            maxlength="300"
+          ></textarea>
+          <button
+            class="send-btn"
+            id="send-btn"
+            aria-label="Enviar comentario"
+            title="Enviar"
+          >
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="comments-list" id="comments-list"></div>
+      </section>
+
       <div class="orn-line">
         <div class="orn-diamond"></div>
       </div>
@@ -736,6 +764,65 @@
       for (let i = 0; i < 8; i++) {
         setTimeout(spawnFirefly, i * 400);
       }
+
+      // === COMMENTS ===
+      const comentarios = [];
+
+      const commentInput = document.getElementById("comment-input");
+      const sendBtn = document.getElementById("send-btn");
+      const commentsList = document.getElementById("comments-list");
+
+      function formatDate(ts) {
+        const d = new Date(ts);
+        return (
+          d.toLocaleDateString("es-ES", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          }) +
+          " · " +
+          d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })
+        );
+      }
+
+      function renderComments() {
+        if (comentarios.length === 0) {
+          commentsList.innerHTML =
+            '<p class="no-comments">Aún no hay susurros... sé el primero.</p>';
+          return;
+        }
+        commentsList.innerHTML = "";
+        comentarios
+          .slice()
+          .reverse()
+          .forEach((c) => {
+            const card = document.createElement("div");
+            card.className = "comment-card";
+            card.innerHTML = `
+        <p class="comment-text">${c.texto.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>
+        <p class="comment-date">${formatDate(c.fecha)}</p>
+      `;
+            commentsList.appendChild(card);
+          });
+      }
+
+      function addComment() {
+        const text = commentInput.value.trim();
+        if (!text) return;
+        comentarios.push({ texto: text, fecha: Date.now() });
+        commentInput.value = "";
+        renderComments();
+      }
+
+      sendBtn.addEventListener("click", addComment);
+      commentInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          addComment();
+        }
+      });
+
+      renderComments();
     </script>
   </body>
 </html>
