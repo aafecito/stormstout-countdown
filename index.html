@@ -537,6 +537,171 @@
           padding: 2rem 1rem;
         }
       }
+
+      /* === COMMENTS SECTION === */
+      .comments-section {
+        width: 100%;
+        max-width: 720px;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .comments-title {
+        font-family: "Cinzel Decorative", cursive;
+        font-size: 1.1rem;
+        color: var(--gold-light);
+        letter-spacing: 0.1em;
+        text-align: center;
+        text-shadow: 0 0 20px rgba(201, 164, 74, 0.4);
+      }
+
+      .comment-input-wrap {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-end;
+        background: var(--panel-bg);
+        border: 1px solid var(--gold-dim);
+        padding: 1rem 1.2rem;
+        position: relative;
+        backdrop-filter: blur(8px);
+      }
+      .comment-input-wrap::before,
+      .comment-input-wrap::after {
+        content: "";
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        border-color: var(--gold);
+        border-style: solid;
+      }
+      .comment-input-wrap::before {
+        top: -1px;
+        left: -1px;
+        border-width: 2px 0 0 2px;
+      }
+      .comment-input-wrap::after {
+        bottom: -1px;
+        right: -1px;
+        border-width: 0 2px 2px 0;
+      }
+
+      .comment-textarea {
+        flex: 1;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--jade);
+        color: var(--cream);
+        font-family: "IM Fell English", serif;
+        font-size: 1rem;
+        resize: none;
+        outline: none;
+        padding: 0.3rem 0;
+        min-height: 42px;
+        line-height: 1.5;
+        caret-color: var(--jade-glow);
+      }
+      .comment-textarea::placeholder {
+        color: var(--jade);
+        opacity: 0.7;
+        font-style: italic;
+      }
+
+      .send-btn {
+        background: none;
+        border: 1px solid var(--jade);
+        color: var(--jade-light);
+        cursor: pointer;
+        padding: 0.45rem 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background 0.2s,
+          color 0.2s,
+          box-shadow 0.2s;
+        flex-shrink: 0;
+      }
+      .send-btn:hover {
+        background: rgba(90, 173, 132, 0.15);
+        color: var(--jade-glow);
+        box-shadow: 0 0 12px rgba(90, 173, 132, 0.3);
+      }
+      .send-btn:active {
+        transform: scale(0.95);
+      }
+      .send-btn svg {
+        width: 22px;
+        height: 22px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .comments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+      }
+
+      .comment-card {
+        background: rgba(10, 20, 14, 0.7);
+        border-left: 2px solid var(--jade);
+        padding: 0.75rem 1rem;
+        animation: commentIn 0.3s ease;
+      }
+
+      @keyframes commentIn {
+        from {
+          opacity: 0;
+          transform: translateX(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .comment-text {
+        font-family: "IM Fell English", serif;
+        font-size: 0.97rem;
+        color: var(--cream);
+        line-height: 1.5;
+        word-break: break-word;
+      }
+
+      .comment-date {
+        font-size: 0.68rem;
+        color: var(--jade-light);
+        opacity: 0.55;
+        margin-top: 0.3rem;
+        letter-spacing: 0.1em;
+        font-family: "Cinzel", serif;
+      }
+
+      .no-comments {
+        font-family: "IM Fell English", serif;
+        font-style: italic;
+        color: var(--jade);
+        opacity: 0.5;
+        text-align: center;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 540px) {
+        .countdown-grid {
+          gap: 0.5rem;
+        }
+        .unit-block + .unit-block::before {
+          font-size: 1.5rem;
+          left: -0.4rem;
+        }
+        .page {
+          padding: 2rem 1rem;
+        }
+      }
     </style>
   </head>
   <body>
